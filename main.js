@@ -45,9 +45,14 @@ const point = ({x, y}) => {
 }
 
 
-// make a line between 2 2d points
+// make a line between 2 2d points on the canvas
 const line = (p1, p2) => {
-
+    ctx.strokeStyle = fg;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
 }
 
 
@@ -110,23 +115,34 @@ so we set z = 0 to put it behind the screen
 */
 
 
+// cornor points of a cube 
 const vertices = [
 
     // a plane of 4 points
     // points in from of eye at z = 0.25
-    {x:  0.25, y:  0.25, z: 0.25},
-    {x: -0.25, y:  0.25, z: 0.25},
-    {x:  0.25, y: -0.25, z: 0.25},
-    {x: -0.25, y: -0.25, z: 0.25},
+    {x:  0.15, y:  0.25, z: 0.15},
+    {x: -0.15, y:  0.25, z: 0.15},
+    {x: -0.15, y: -0.25, z: 0.15},
+    {x:  0.15, y: -0.25, z: 0.15},
 
     // points behind us at z = 0.25
-    {x:  0.25, y:  0.25, z: -0.25},
-    {x: -0.25, y:  0.25, z: -0.25},
-    {x:  0.25, y: -0.25, z: -0.25},
-    {x: -0.25, y: -0.25, z: -0.25},
+    {x:  0.15, y:  0.25, z: -0.15},
+    {x: -0.15, y:  0.25, z: -0.15},
+    {x: -0.15, y: -0.25, z: -0.15},
+    {x:  0.15, y: -0.25, z: -0.15},
 
     // now we have a cube (we are standing at the centre of the cube)
     // then cube starts to move away from us
+];
+
+// the faces of the cube (how points are connected)
+// values are indices of vertices array
+const faces = [
+    // back face of the cube
+    [0, 1, 2, 3],
+
+    // front face of the cube
+    [4, 5, 6, 7],
 ];
 
 
@@ -169,14 +185,39 @@ let angle = 0; // angle offset
 
 const frame = () => {
 
-// sync offset with timing
-//dz += 1 * dt;
-angle += Math.PI * dt; // half rev per second
+    // sync offset with timing
+    //dz += 1 * dt;
+    angle += Math.PI * dt; // half rev per second
+    
 
-clear();
-for (const v of vertices) {
-    point(screen(project(translate_z(rotate_xz(v, angle), dz))));
+    clear();
+    for (const v of vertices) {
+        point(screen(project(translate_z(rotate_xz(v, angle), dz))));
     } 
+
+    // for a cube
+    for (let i = 0; i < faces[0].length; i++) 
+    {
+        const a = vertices[faces[0][i]];
+        const b = vertices[faces[1][i]];
+
+        line(screen(project(translate_z(rotate_xz(a, angle), dz))),
+            screen(project(translate_z(rotate_xz(b, angle), dz)))
+        );
+
+    }
+
+    for (const f of faces) {
+        // connect 0 & 1, 1 & 2, 2 & 3, 3 & 0
+        for (let i = 0; i < f.length; i++) {
+            const a = vertices[f[i]];
+            const b = vertices[f[(i + 1) % f.length]];
+
+            line(screen(project(translate_z(rotate_xz(a, angle), dz))),
+                screen(project(translate_z(rotate_xz(b, angle), dz)))
+            );
+        }
+    }
 
     setTimeout(frame, 1000/FPS);
 }
