@@ -36,19 +36,36 @@ const clear = () => {
     ctx.fillRect(0, 0, game.width, game.height);
 }
 
+// we take point obj {x, y}
 // for placing points on the screen
-const point = (x, y) => {
+// expects coords in canvas system
+const point = (p) => {
     ctx.fillStyle = fg;
-    ctx.fillRect(x, y, s, s);
+    ctx.fillRect(p.x, p.y, s, s);
 }
-
-clear();
-point(game.width/2 - s/2, game.height/2 - s/2);
 
 
 
 /*
 the formula assumes that the the middle of your screen is the (0, 0) point (the origin)
 but in html canvas, the top left corner is (0, 0) and mid is (width/2, height/2)
+
+so we need a function to convert from the (0, 0) coord system of the 2d projection (range [-1,1])
+to the canvas coord system (w/2, h/2) 
 */
+
+
+
+// function to convert [-1, 1] (0, 0) => [0, w] & [0, h] (w/2, h/2)
+// expects coords in formula system
+const screen = (p) => {
+    // [-1, 1] => add 1 => [0, 2] => div by 2 => [0, 1]
+    // xply by width/height => [0, w] & [0, h]
+    return {
+        x: (p.x + 1) / 2 * game.width,
+        y: (p.y + 1) / 2 * game.height,
+    }
+}
+
+
 
