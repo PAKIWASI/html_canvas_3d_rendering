@@ -38,12 +38,17 @@ const clear = () => {
 // we take point obj {x, y}
 // for placing points on the screen
 // expects coords in canvas system
-const point = (p2) => {
+const point = ({x, y}) => {
     const s = 15;     // point size
     ctx.fillStyle = fg;
-    ctx.fillRect(p2.x - s / 2, p2.y - s / 2, s, s);
+    ctx.fillRect(x - s / 2, y - s / 2, s, s);
 }
 
+
+// make a line between 2 2d points
+const line = (p1, p2) => {
+
+}
 
 
 /*
@@ -63,15 +68,15 @@ so we need to flip y cord when projecting to canvas
 // function to convert [-1, 1] (0, 0) => [0, w] & [0, h] (w/2, h/2)
 // expects coords in formula system
 // passed onj to point func
-const screen = (p2) => {
+const screen = ({x, y}) => {
     // [-1, 1] => add 1 => [0, 2] => div by 2 => [0, 1]
     // xply by width/height => [0, w] & [0, h]
     
         // the nomalized coods (to pass to canvas)
     return { 
-        x: ((p2.x + 1) / 2) * game.width,
+        x: ((x + 1) / 2) * game.width,
         // pos up and neg down (formula) => neg up pos down (canvas)
-        y: (1 - (p2.y + 1) / 2) * game.height,
+        y: (1 - (y + 1) / 2) * game.height,
     }
 }
 
@@ -80,10 +85,10 @@ const screen = (p2) => {
 // takes a 3d point p3{x, y, z}
 // applies formula on it
 // passed obj to screen func
-const project = (p3) => {
+const project = ({x, y, z}) => {
     return {
-        x: p3.x/p3.z,
-        y: p3.y/p3.z,
+        x: x / z,
+        y: y / z,
     }
 }
 
@@ -108,17 +113,17 @@ so we set z = 0 to put it behind the screen
 const vertices = [
 
     // a plane of 4 points
-    // points in from of eye at z = 0.5
-    {x:  0.5, y:  0.5, z: 0.5},
-    {x: -0.5, y:  0.5, z: 0.5},
-    {x:  0.5, y: -0.5, z: 0.5},
-    {x: -0.5, y: -0.5, z: 0.5},
+    // points in from of eye at z = 0.25
+    {x:  0.25, y:  0.25, z: 0.25},
+    {x: -0.25, y:  0.25, z: 0.25},
+    {x:  0.25, y: -0.25, z: 0.25},
+    {x: -0.25, y: -0.25, z: 0.25},
 
-    // points behind us at z = 0.5
-    {x:  0.5, y:  0.5, z: -0.5},
-    {x: -0.5, y:  0.5, z: -0.5},
-    {x:  0.5, y: -0.5, z: -0.5},
-    {x: -0.5, y: -0.5, z: -0.5},
+    // points behind us at z = 0.25
+    {x:  0.25, y:  0.25, z: -0.25},
+    {x: -0.25, y:  0.25, z: -0.25},
+    {x:  0.25, y: -0.25, z: -0.25},
+    {x: -0.25, y: -0.25, z: -0.25},
 
     // now we have a cube (we are standing at the centre of the cube)
     // then cube starts to move away from us
@@ -126,10 +131,11 @@ const vertices = [
 
 
 // increase z offset by dz
-const translate_z = (p3, dz) => {
+const translate_z = ({x, y, z}, dz) => {
     return {
-        ...p3,
-        z: p3.z + dz,
+        x,
+        y, 
+        z: z + dz,
     }
 }
 
@@ -156,7 +162,7 @@ const dt = 1/FPS; // 1 second / no of frames per second
 
 // by increasing z, we move the points away from the eye
 // and more into the screen
-let dz = 0; // z offset
+let dz = 1; // z offset
 
 let angle = 0; // angle offset
 
@@ -164,8 +170,8 @@ let angle = 0; // angle offset
 const frame = () => {
 
 // sync offset with timing
-dz += 1 * dt;
-angle += 2 * Math.PI * dt; // one rev per second
+//dz += 1 * dt;
+angle += Math.PI * dt; // half rev per second
 
 clear();
 for (const v of vertices) {
