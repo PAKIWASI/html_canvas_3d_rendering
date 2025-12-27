@@ -1,5 +1,6 @@
 
 
+
 /*
 consider an imaginary 3d space behind your 2d screen
 if (x, y, z) is a point in the 3d space, then to project it to your 2d screen
@@ -16,7 +17,7 @@ then we can display that on the screen using the above formula
 const canvas = game;
 console.log(game);
 
-game.width = 1250;
+game.width = 700;
 game.height = 700;
 
 // get the 2d context of the element "game" 
@@ -108,6 +109,7 @@ x/y             screen
 0-------------------|--------------------> z axis
 eye                 |
                     |
+                    1
 
 z = 0 means the obj is exactly in your eye (no where to project)
 so we need to put z behind the screen so we can see it projected
@@ -115,43 +117,13 @@ so we set z = 0 to put it behind the screen
 */
 
 
-// cornor points of a cube 
-const vertices = [
-
-    // a plane of 4 points
-    // points in from of eye at z = 0.25
-    {x:  0.15, y:  0.25, z: 0.15},
-    {x: -0.15, y:  0.25, z: 0.15},
-    {x: -0.15, y: -0.25, z: 0.15},
-    {x:  0.15, y: -0.25, z: 0.15},
-
-    // points behind us at z = 0.25
-    {x:  0.15, y:  0.25, z: -0.15},
-    {x: -0.15, y:  0.25, z: -0.15},
-    {x: -0.15, y: -0.25, z: -0.15},
-    {x:  0.15, y: -0.25, z: -0.15},
-
-    // now we have a cube (we are standing at the centre of the cube)
-    // then cube starts to move away from us
-];
-
-// the faces of the cube (how points are connected)
-// values are indices of vertices array
-const faces = [
-    // back face of the cube
-    [0, 1, 2, 3],
-
-    // front face of the cube
-    [4, 5, 6, 7],
-];
-
 
 // increase z offset by dz
 const translate_z = ({x, y, z}, dz) => {
     return {
         x,
         y, 
-        z: z + dz,
+        z: z + dz, // only display when z is front of eye (z!=0)
     }
 }
 
@@ -178,7 +150,7 @@ const dt = 1/FPS; // 1 second / no of frames per second
 
 // by increasing z, we move the points away from the eye
 // and more into the screen
-let dz = 1; // z offset
+let dz = 2; // z offset
 
 let angle = 0; // angle offset
 
@@ -191,21 +163,6 @@ const frame = () => {
     
 
     clear();
-    for (const v of vertices) {
-        point(screen(project(translate_z(rotate_xz(v, angle), dz))));
-    } 
-
-    // for a cube
-    for (let i = 0; i < faces[0].length; i++) 
-    {
-        const a = vertices[faces[0][i]];
-        const b = vertices[faces[1][i]];
-
-        line(screen(project(translate_z(rotate_xz(a, angle), dz))),
-            screen(project(translate_z(rotate_xz(b, angle), dz)))
-        );
-
-    }
 
     for (const f of faces) {
         // connect 0 & 1, 1 & 2, 2 & 3, 3 & 0
@@ -222,6 +179,13 @@ const frame = () => {
     setTimeout(frame, 1000/FPS);
 }
 
+
 frame();
 
 
+
+
+/*  Why and How this formula works ?
+
+
+*/
