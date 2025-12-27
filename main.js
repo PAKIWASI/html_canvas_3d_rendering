@@ -38,10 +38,10 @@ const clear = () => {
 // we take point obj {x, y}
 // for placing points on the screen
 // expects coords in canvas system
-const point = (p) => {
+const point = (p2) => {
     const s = 15;     // point size
     ctx.fillStyle = fg;
-    ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+    ctx.fillRect(p2.x - s / 2, p2.y - s / 2, s, s);
 }
 
 
@@ -62,19 +62,48 @@ so we need to flip y cord when projecting to canvas
 
 // function to convert [-1, 1] (0, 0) => [0, w] & [0, h] (w/2, h/2)
 // expects coords in formula system
-const screen = (p) => {
+// passed onj to point func
+const screen = (p2) => {
     // [-1, 1] => add 1 => [0, 2] => div by 2 => [0, 1]
     // xply by width/height => [0, w] & [0, h]
     
         // the nomalized coods (to pass to canvas)
     return { 
-        x: ((p.x + 1) / 2) * game.width,
+        x: ((p2.x + 1) / 2) * game.width,
         // pos up and neg down (formula) => neg up pos down (canvas)
-        y: (1 - (p.y + 1) / 2) * game.height,
+        y: (1 - (p2.y + 1) / 2) * game.height,
     }
 }
 
 
+
+// takes a 3d point p3{x, y, z}
+// applies formula on it
+// passed obj to screen func
+const project = (p3) => {
+    return {
+        x: p3.x/p3.z,
+        y: p3.y/p3.z,
+    }
+}
+
+/*
+formula assumes that your eye is located at 0 of z axis
+z axis goes right throght the middle of the screen w/2, h/2
+
+
+x/y             screen
+|                   |
+|                   |
+0-------------------|--------------------> z axis
+eye                 |
+                    |
+
+z = 0 means the obj is exactly in your eye (no where to project)
+so we need to put z behind the screen so we can see it projected
+so we set z = 0 to put it behind the screen
+*/
+
 clear();
-point(screen({x: 0, y: 0.5}));
+point(screen(project({x: 0, y: 0.3, z: 1})));
 
