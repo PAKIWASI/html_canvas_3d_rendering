@@ -104,6 +104,21 @@ so we need to put z behind the screen so we can see it projected
 so we set z = 0 to put it behind the screen
 */
 
-clear();
-point(screen(project({x: 0.1, y: 0.3, z: 1})));
+const FPS = 60;
+// delta time between the frames
+const dt = 1/FPS; // 1 second / no of frames per second
 
+
+let dz = 0; // z offset
+const frame = () => {
+
+    // sync offset with timing
+    dz += 1 * dt;
+
+    clear();
+    point(screen(project({x: 0.5, y: 0, z: 1 + dz})));
+
+    setTimeout(frame, 1000/FPS);
+}
+
+frame();
