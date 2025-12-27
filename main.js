@@ -62,10 +62,12 @@ const screen = (p) => {
     // [-1, 1] => add 1 => [0, 2] => div by 2 => [0, 1]
     // xply by width/height => [0, w] & [0, h]
     return {
-        x: (p.x + 1) / 2 * game.width,
-        y: (p.y + 1) / 2 * game.height,
+        x: ((p.x + 1) / 2) * game.width,
+        y: ((p.y + 1) / 2) * game.height,
     }
 }
 
 
+clear();
+point(screen({x: 0, y: 0}));
 
