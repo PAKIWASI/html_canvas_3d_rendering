@@ -16,8 +16,8 @@ then we can display that on the screen using the above formula
 const canvas = game;
 console.log(game);
 
-game.width = 800;
-game.height = 600;
+game.width = 1250;
+game.height = 700;
 
 // get the 2d context of the element "game" 
 // the thing onto which drawing is rendered
@@ -105,5 +105,5 @@ so we set z = 0 to put it behind the screen
 */
 
 clear();
-point(screen(project({x: 0, y: 0.3, z: 1})));
+point(screen(project({x: 0.1, y: 0.3, z: 1})));
 
