@@ -104,21 +104,77 @@ so we need to put z behind the screen so we can see it projected
 so we set z = 0 to put it behind the screen
 */
 
+
+const vertices = [
+
+    // a plane of 4 points
+    // points in from of eye at z = 0.5
+    {x:  0.5, y:  0.5, z: 0.5},
+    {x: -0.5, y:  0.5, z: 0.5},
+    {x:  0.5, y: -0.5, z: 0.5},
+    {x: -0.5, y: -0.5, z: 0.5},
+
+    // points behind us at z = 0.5
+    {x:  0.5, y:  0.5, z: -0.5},
+    {x: -0.5, y:  0.5, z: -0.5},
+    {x:  0.5, y: -0.5, z: -0.5},
+    {x: -0.5, y: -0.5, z: -0.5},
+
+    // now we have a cube (we are standing at the centre of the cube)
+    // then cube starts to move away from us
+];
+
+
+// increase z offset by dz
+const translate_z = (p3, dz) => {
+    return {
+        ...p3,
+        z: p3.z + dz,
+    }
+}
+
+// rotate around y axis
+// we rotate x and z point using 2d rotation matrix
+// we input x, z and an angle
+// we get x', z' which are coords of rotated x,z by angle
+const rotate_xz = ({x, y, z}, angle) => {
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    
+    return {
+        x: x * c - z * s,
+        y,
+        z: x * s + z * c,
+    }
+}
+
+
 const FPS = 60;
-// delta time between the frames
+// delta time : amount of time between curr frame and previous frame in the loop
+// this makes movement FPS independent
 const dt = 1/FPS; // 1 second / no of frames per second
 
-
+// by increasing z, we move the points away from the eye
+// and more into the screen
 let dz = 0; // z offset
+
+let angle = 0; // angle offset
+
+
 const frame = () => {
 
-    // sync offset with timing
-    dz += 1 * dt;
+// sync offset with timing
+dz += 1 * dt;
+angle += 2 * Math.PI * dt; // one rev per second
 
-    clear();
-    point(screen(project({x: 0.5, y: 0, z: 1 + dz})));
+clear();
+for (const v of vertices) {
+    point(screen(project(translate_z(rotate_xz(v, angle), dz))));
+    } 
 
     setTimeout(frame, 1000/FPS);
 }
 
 frame();
+
+
