@@ -18,7 +18,6 @@ console.log(game);
 
 game.width = 800;
 game.height = 600;
-const s = 15;     // point size
 
 // get the 2d context of the element "game" 
 // the thing onto which drawing is rendered
@@ -40,8 +39,9 @@ const clear = () => {
 // for placing points on the screen
 // expects coords in canvas system
 const point = (p) => {
+    const s = 15;     // point size
     ctx.fillStyle = fg;
-    ctx.fillRect(p.x, p.y, s, s);
+    ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s);
 }
 
 
@@ -52,6 +52,10 @@ but in html canvas, the top left corner is (0, 0) and mid is (width/2, height/2)
 
 so we need a function to convert from the (0, 0) coord system of the 2d projection (range [-1,1])
 to the canvas coord system (w/2, h/2) 
+
+also, y cord in canvas goes down on increaing values and vice versa
+but in our system, y should go up when we increase value and vice versa
+so we need to flip y cord when projecting to canvas
 */
 
 
@@ -61,13 +65,16 @@ to the canvas coord system (w/2, h/2)
 const screen = (p) => {
     // [-1, 1] => add 1 => [0, 2] => div by 2 => [0, 1]
     // xply by width/height => [0, w] & [0, h]
-    return {
+    
+        // the nomalized coods (to pass to canvas)
+    return { 
         x: ((p.x + 1) / 2) * game.width,
-        y: ((p.y + 1) / 2) * game.height,
+        // pos up and neg down (formula) => neg up pos down (canvas)
+        y: (1 - (p.y + 1) / 2) * game.height,
     }
 }
 
 
 clear();
-point(screen({x: 0, y: 0}));
+point(screen({x: 0, y: 0.5}));
 
